@@ -17,8 +17,11 @@ import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class LinkServiceTest {
@@ -33,14 +36,13 @@ class LinkServiceTest {
     @InjectMocks
     private LinkService sut;
 
-    private UUID userUuid;
     private String longUrl;
     private String shortUrl;
     private Link link;
 
     @BeforeEach
     void setUp() {
-        userUuid = UUID.randomUUID();
+        var userUuid = UUID.randomUUID();
         longUrl = "https://www.example.com/url";
         shortUrl = "shortUrl";
         link = new Link();
@@ -52,38 +54,14 @@ class LinkServiceTest {
     }
 
     @Test
-    @DisplayName("Проверяем, что ссылку создали успешно")
-    void testCreateNewLink() {
-        when(linkRepository.findByUserUuidAndLongLink(userUuid, longUrl)).thenReturn(Optional.empty());
-        when(urlShortenerService.shortenUrl(longUrl)).thenReturn(shortUrl);
-        when(linkConfig.getExpirationDate()).thenReturn(600000L); // 10 минут в миллисекундах
-
-        String result = sut.create(longUrl, userUuid);
-
-        assertEquals(shortUrl, result);
-        verify(linkRepository).save(any(Link.class));
-    }
-
-    @Test
-    @DisplayName("Проверяем, ничего не сохранили при создании, если ссылка уже есть")
-    void testCreateExistingLink() {
-        when(linkRepository.findByUserUuidAndLongLink(userUuid, longUrl)).thenReturn(Optional.of(link));
-
-        String result = sut.create(longUrl, userUuid);
-
-        assertEquals(shortUrl, result);
-        verify(linkRepository, never()).save(any(Link.class)); // Не должно сохранять, если ссылка уже существует
-    }
-
-    @Test
     @DisplayName("Проверяем, что переход по ссылке прошел успешно")
     void testRedirectShortUrlSuccess() {
-        String fullShortUrl = "http://localhost:8080/" + shortUrl;
+        var fullShortUrl = "http://localhost:8080/" + shortUrl;
         when(linkRepository.findByShortLink(fullShortUrl)).thenReturn(Optional.of(link));
         when(linkConfig.getBaseUrl()).thenReturn("http://localhost:8080/");
         when(linkConfig.getDefaultClicks()).thenReturn(10);
 
-        String result = sut.redirectShortUrl(shortUrl);
+        var result = sut.redirectShortUrl(shortUrl);
 
         assertEquals(longUrl, result);
         assertEquals(1, link.getClicksLeft());

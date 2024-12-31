@@ -31,20 +31,13 @@ public class LinkService {
      * Создает сокращенную ссылку на основании длинной.
      */
     public String create(String longUrl, UUID uuidUser) {
-        // проверяем есть ли уже сохраненная ссылка
-        var link = linkRepository.findByUserUuidAndLongLink(uuidUser, longUrl)
-                .orElse(null);
+        var link = new Link();
+        link.setLongLink(longUrl);
+        link.setUserUuid(uuidUser);
+        link.setShortLink(urlShortenerService.shortenUrl(longUrl));
+        link.setExpirationDate(Instant.ofEpochMilli(Instant.now().toEpochMilli() + linkConfig.getExpirationDate()));
 
-        // если ссылки нет, тогда создаем новую
-        if (link == null) {
-            link = new Link();
-            link.setLongLink(longUrl);
-            link.setUserUuid(uuidUser);
-            link.setShortLink(urlShortenerService.shortenUrl(longUrl));
-            link.setExpirationDate(Instant.ofEpochMilli(Instant.now().toEpochMilli() + linkConfig.getExpirationDate()));
-
-            linkRepository.save(link);
-        }
+        link = linkRepository.save(link);
 
         return link.getShortLink();
     }

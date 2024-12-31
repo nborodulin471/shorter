@@ -29,10 +29,10 @@ class UrlShortenerServiceImplTest {
     void testShortenUrlGeneratesCorrectLength() {
         when(linkConfig.getUrlLength()).thenReturn(6);
         when(linkConfig.getBaseUrl()).thenReturn("http://localhost:8080/");
-        String longUrl = "http://www.example.com/url";
+        var longUrl = "http://www.example.com/url";
         var lengthBaseUrl = linkConfig.getBaseUrl().length();
 
-        String actual = sut.shortenUrl(longUrl);
+        var actual = sut.shortenUrl(longUrl);
 
         assertNotNull(actual);
         assertTrue(actual.contains(linkConfig.getBaseUrl()));
@@ -44,11 +44,11 @@ class UrlShortenerServiceImplTest {
     void testShortenUrlGeneratesUniqueUrls() {
         when(linkConfig.getUrlLength()).thenReturn(6);
         when(linkConfig.getBaseUrl()).thenReturn("http://localhost:8080/");
-        String longUrl1 = "http://www.example.com/url1";
-        String longUrl2 = "http://www.example.com//url2";
+        var longUrl1 = "http://www.example.com/url1";
+        var longUrl2 = "http://www.example.com//url2";
 
-        String shortUrl1 = sut.shortenUrl(longUrl1);
-        String shortUrl2 = sut.shortenUrl(longUrl2);
+        var shortUrl1 = sut.shortenUrl(longUrl1);
+        var shortUrl2 = sut.shortenUrl(longUrl2);
 
         assertNotEquals(shortUrl1, shortUrl2);
     }
