@@ -25,7 +25,7 @@ public class ExpiredLinkService {
      * Очищает устаревшие ссылки раз в заданный промежуток времени.
      */
     @Scheduled(fixedRate = 600000) // 1 раз в десять минут
-    public void isExpired() {
+    public void deleteExpiredLinks() {
         var expiredLinks = linkRepository.findAll().stream()
                 .filter(link -> isExpired(link.getExpirationDate()))
                 .toList();

@@ -30,12 +30,19 @@ public class LinkService {
     /**
      * Создает сокращенную ссылку на основании длинной.
      */
-    public String create(String longUrl, UUID uuidUser) {
+    public String create(String longUrl, UUID uuidUser, long expirationMinutes) {
+        // ограничим указанное пользователем время жизни ссылки.
+        var ttl = linkConfig.getExpirationDate();
+        var expirationMilliseconds = minutesToMilliseconds(expirationMinutes);
+        if (expirationMilliseconds > ttl){
+            ttl = expirationMilliseconds;
+        }
+
         var link = new Link();
         link.setLongLink(longUrl);
         link.setUserUuid(uuidUser);
         link.setShortLink(urlShortenerService.shortenUrl(longUrl));
-        link.setExpirationDate(Instant.ofEpochMilli(Instant.now().toEpochMilli() + linkConfig.getExpirationDate()));
+        link.setExpirationDate(Instant.ofEpochMilli(Instant.now().toEpochMilli() + ttl));
 
         link = linkRepository.save(link);
 
@@ -65,5 +72,9 @@ public class LinkService {
                 shortUrl, link.getLongLink(), linkConfig.getDefaultClicks() - link.getClicksLeft());
 
         return link.getLongLink();
+    }
+
+    private static long minutesToMilliseconds(long minutes) {
+        return minutes * 60 * 1000;
     }
 }

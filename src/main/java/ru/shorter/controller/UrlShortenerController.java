@@ -35,9 +35,9 @@ public class UrlShortenerController {
      * Формирует короткую ссылку.
      */
     @PostMapping("/shorten")
-    public String shortenUrl(@RequestParam String longUrl, Model model, HttpSession session) {
+    public String shortenUrl(@RequestParam String longUrl, @RequestParam long expirationMinutes,  Model model, HttpSession session) {
         var uuidUser = userUuidService.generateUuid(session);
-        String shortUrl = linkService.create(longUrl, uuidUser);
+        String shortUrl = linkService.create(longUrl, uuidUser, expirationMinutes);
         model.addAttribute("shortUrl", shortUrl);
 
         return "result";
