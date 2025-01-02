@@ -22,5 +22,5 @@ public class LinkConfig {
     private int defaultClicks;
     private int urlLength;
     private String baseUrl;
-    private long expirationDate;
+    private long expirationDateMin;
 }

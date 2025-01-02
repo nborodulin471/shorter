@@ -5,6 +5,7 @@ import org.springframework.stereotype.Repository;
 
 import ru.shorter.model.Link;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -16,6 +17,9 @@ import java.util.UUID;
 @Repository
 public interface LinkRepository extends JpaRepository<Link, Long> {
 
+    List<Link> findAllByUserUuid(UUID userId);
     Optional<Link> findByShortLink(String shortLink);
-    Optional<Link> findByUserUuidAndLongLink(UUID userUuid,  String longLink);
+    Optional<Link> findByUuid(UUID uuid);
+    void deleteByUuid(UUID uuid);
+
 }

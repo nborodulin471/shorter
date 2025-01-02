@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
 <head>
     <title>Сокращение URL</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
@@ -13,11 +13,47 @@
             <input type="text" id="longUrl" name="longUrl" class="form-control" required>
         </div>
         <div class="form-group">
-            <label for="expirationMinutes">Срок действия (в минутах):</label>
-            <input type="number" id="expirationMinutes" name="expirationMinutes" class="form-control" min="1" value="60" required>
+            <label for="expirationMinutes">Срок действия (в минутах): </label>
+            <input type="number" id="expirationMinutes" name="expirationMinutes" class="form-control" th:min="${@linkConfig.getExpirationDateMin()}" value="60"
+                   required>
         </div>
         <button type="submit" class="btn btn-primary">Сократить</button>
     </form>
+
+    <h2 class="mt-5">Список сокращенных ссылок</h2>
+    <table class="table mt-3">
+        <thead>
+        <tr>
+            <th>Длинный URL</th>
+            <th>Сокращенный URL</th>
+            <th>Срок действия</th>
+            <th>Обновить срок действия (UTC)</th>
+            <th>Удаление</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="link : ${links}">
+            <td th:text="${link.longUrl}"></td>
+            <td th:text="${link.shortUrl}"></td>
+            <td th:text="${link.expirationDate}"></td>
+            <td>
+                <form th:action="@{/updateExpiration}" method="post" class="dropdown-item">
+                    <input type="hidden" name="uuid" th:value="${link.uuid}"/>
+                    <label for="expirationMinutes">Срок действия (мин):</label>
+                    <input type="number" name="expirationMinutes" class="form-control" th:min="${@linkConfig.getExpirationDateMin()}"
+                           th:value="${link.expirationDate}" required/>
+                    <button type="submit" class="btn btn-warning mt-2">Изменить</button>
+                </form>
+            </td>
+            <td>
+                <form th:action="@{/deleteLink}" method="post" class="dropdown-item">
+                    <input type="hidden" name="uuid" th:value="${link.uuid}"/>
+                    <button type="submit" class="btn btn-danger">Удалить</button>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
 </div>
 </body>
 </html>
